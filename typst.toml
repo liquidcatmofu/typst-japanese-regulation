@@ -5,6 +5,7 @@ entrypoint = "lib.typ"
 authors = ["LiquidCatMofu"]
 license = "MIT-0"
 description = "Typst-native building blocks for Japanese regulation documents"
+repository = "https://github.com/liquidcatmofu/typst-japanese-regulation"
 compiler = "0.15.1"
 keywords = ["japanese", "regulation", "rules", "legal"]
 categories = ["office"]
