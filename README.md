@@ -1,4 +1,4 @@
-# japanese-regulation
+# hanko-kitei
 
 日本語の規程文書を、Typst標準の構造を活かして記述するための小さなパッケージです。
 章・節・条・項・号の採番、相互参照、目次を自動化します。
@@ -21,7 +21,7 @@
 `typst init` で、上の画像と同じ内容の雛形を作成できます。
 
 ```sh
-typst init @preview/japanese-regulation:0.1.0 my-regulation
+typst init @preview/hanko-kitei:0.1.0 my-regulation
 ```
 
 作成されるのは次の構成です。本文は `rules/` 以下に分けて書きます。
@@ -37,7 +37,7 @@ rules/02-procedure.typ   手続（節、参照、表、改ページ）
 ## 使用例
 
 ```typst
-#import "@preview/japanese-regulation:0.1.0": article, regulation
+#import "@preview/hanko-kitei:0.1.0": article, regulation
 
 #show: regulation.with(title: "就業規則")
 

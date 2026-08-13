@@ -108,10 +108,10 @@
 
 // 条と用語リストの補助関数は本文内で評価されます。各呼び出しに設定引数を
 // 追加せず文書全体の設定を参照できるよう、stateを介して共有します。
-#let _config-state = state("japanese-regulation-config", default-config)
+#let _config-state = state("hanko-kitei-config", default-config)
 
 // 1コンパイル単位でregulationが何回使われたかを数えます。
-#let _instance-state = state("japanese-regulation-instances", 0)
+#let _instance-state = state("hanko-kitei-instances", 0)
 
 /// 章、節、条、号の番号を表示用に整形します。
 ///
@@ -214,6 +214,8 @@
 // `full` を変更するとこの判別が壊れます。
 // 番号を空にすると列挙が番号欄を詰めてしまい、単一項の条だけ本文が左へ寄ります。
 // `hide` は描画せず幅だけ残すため、条をまたいで本文の左端が揃います。
+// 表示中の数字とは差が残りますが（Typst 0.15.1・既定フォントでの観測で 0.91pt）、
+// これは実測値であって仕様ではありません。版やフォントが変われば変動します。
 #let _singleton-paragraph-numbering(..numbers) = {
   let values = numbers.pos()
   if values.len() == 1 { hide(_enum-numbering(..numbers)) } else { _enum-numbering(..numbers) }

@@ -1,4 +1,4 @@
-#import "@preview/japanese-regulation:0.1.0": article
+#import "@preview/hanko-kitei:0.1.0": article
 
 = 手続
 
