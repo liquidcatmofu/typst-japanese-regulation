@@ -230,6 +230,25 @@
   }
 }
 
+// 章・節見出しの採番と題名を組み立てます。markup で書くと要素の間の改行が空白として
+// 入り込み、`heading-title-gap` が指定値より広くなるため、コードモードで連結します。
+// `counter(heading)` を読むので、呼び出し側は context 内である必要があります。
+#let _heading-content(it, size, gap, config) = text(
+  font: config.heading-font,
+  size: size,
+  weight: config.heading-weight,
+)[#{
+  if it.numbering != none {
+    numbering(it.numbering, ..counter(heading).get())
+    h(config.heading-title-gap)
+  }
+  if it.body.func() == text {
+    _spaced-if-short(it.body.text, gap, length: config.short-title-length)
+  } else {
+    it.body
+  }
+}]
+
 #let _described-items(items) = {
   for item in items.children {
     counter("described-item").step()
@@ -353,40 +372,16 @@
 
   // 章・節の独自描画は、短い題名の自動字間調整にだけ使用します。
   // 採番には引き続きTypst標準の見出しカウンタを使用します。
-  show heading.where(level: 1): it => context {
-    block(above: config.chapter-above, below: config.chapter-below)[
-      #text(font: config.heading-font, size: config.chapter-size, weight: config.heading-weight)[
-        #if it.numbering != none {
-          numbering(it.numbering, ..counter(heading).get())
-          h(config.heading-title-gap)
-        }
-        #if it.body.func() == text {
-          _spaced-if-short(
-            it.body.text,
-            config.short-chapter-gap,
-            length: config.short-title-length,
-          )
-        } else { it.body }
-      ]
-    ]
-  }
-  show heading.where(level: 2): it => context {
-    block(above: config.section-above, below: config.section-below)[
-      #text(font: config.heading-font, size: config.section-size, weight: config.heading-weight)[
-        #if it.numbering != none {
-          numbering(it.numbering, ..counter(heading).get())
-          h(config.heading-title-gap)
-        }
-        #if it.body.func() == text {
-          _spaced-if-short(
-            it.body.text,
-            config.short-section-gap,
-            length: config.short-title-length,
-          )
-        } else { it.body }
-      ]
-    ]
-  }
+  show heading.where(level: 1): it => context block(
+    above: config.chapter-above,
+    below: config.chapter-below,
+    _heading-content(it, config.chapter-size, config.short-chapter-gap, config),
+  )
+  show heading.where(level: 2): it => context block(
+    above: config.section-above,
+    below: config.section-below,
+    _heading-content(it, config.section-size, config.short-section-gap, config),
+  )
 
   // 題名の字間、字下げ、リーダー、ページ番号を本文を変更せず調整できるよう、
   // 目次のレイアウトを1つのルールにまとめます。

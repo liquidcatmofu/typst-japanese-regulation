@@ -10,3 +10,11 @@ compiler = "0.15.1"
 keywords = ["japanese", "regulation", "rules", "legal"]
 categories = ["office"]
 disciplines = ["law", "business"]
+# README用の画像はUniverseの表示に必要なのでコミットしますが、
+# 配布バンドルには含めません。サムネイルは自動で除外されます。
+exclude = ["docs"]
+
+[template]
+path = "template"
+entrypoint = "main.typ"
+thumbnail = "thumbnail.png"
