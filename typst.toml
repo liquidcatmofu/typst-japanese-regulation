@@ -1,0 +1,9 @@
+[package]
+name = "japanese-regulation"
+version = "0.1.0"
+entrypoint = "lib.typ"
+authors = ["LiquidCatMofu"]
+license = "MIT-0"
+description = "Typst-native building blocks for Japanese regulation documents"
+compiler = "0.15.1"
+keywords = ["japanese", "regulation", "rules", "legal"]
