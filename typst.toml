@@ -7,3 +7,5 @@ license = "MIT-0"
 description = "Typst-native building blocks for Japanese regulation documents"
 compiler = "0.15.1"
 keywords = ["japanese", "regulation", "rules", "legal"]
+categories = ["office"]
+disciplines = ["law", "business"]

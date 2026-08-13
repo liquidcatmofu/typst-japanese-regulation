@@ -52,9 +52,12 @@ typst compile --root . examples/basic.typ /tmp/basic.pdf
 `regulation(config: (...))` へ渡せます。
 
 文書メタデータは `title` / `author`、フォントは `config` の `body-font` /
-`heading-font`、表紙と目次は `cover` / `toc` で設定できます。
-1つのコンパイル単位では `regulation` を1回だけ使用してください。
-目次はコンパイル単位全体の見出しを検索するため、複数文書の結合には対応しません。
+`heading-font`、表紙と目次は `cover` / `toc` で設定できます。表紙にページ番号は
+表示しませんが、ページ数の計上は継続します。
+
+1つのコンパイル単位では `regulation` を1回だけ使用してください。目次はコンパイル単位
+全体の見出しを検索するため、複数文書の結合には対応しません。2回目の呼び出しは
+コンパイルエラーになります。
 
 サポート対象の公開APIは `regulation`、`article`、`default-config` です。
 アンダースコアで始まる名前は内部実装であり、互換性の対象外です。

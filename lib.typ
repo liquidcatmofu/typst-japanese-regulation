@@ -72,6 +72,9 @@
 // 追加せず文書全体の設定を参照できるよう、stateを介して共有します。
 #let _config-state = state("japanese-regulation-config", default-config)
 
+// 1コンパイル単位でregulationが何回使われたかを数えます。
+#let _instance-state = state("japanese-regulation-instances", 0)
+
 /// 章、節、条、号の番号を表示用に整形します。
 ///
 /// 1桁は全角数字、2桁以上はASCII数字で表示します。
@@ -167,6 +170,10 @@
 // 別の関数として定義し、列挙のshowルールが自身の出力へ再適用されるのを防ぎます。
 #let _rendered-enum-numbering(..numbers) = _enum-numbering(..numbers)
 
+// 項が1つだけの条で、その項番号を省略します。判定は「列挙の深さ」で行います。
+// `full: true` により numbering は親からの番号すべてを受け取るため、引数が1つなら
+// 最上位＝項、2つ以上なら入れ子＝号です。号は項数にかかわらず採番を維持します。
+// `full` を変更するとこの判別が壊れます。
 #let _singleton-paragraph-numbering(..numbers) = {
   let values = numbers.pos()
   if values.len() == 1 { [] } else { _enum-numbering(..numbers) }
@@ -278,9 +285,9 @@
   show terms: _described-items
   show ref: it => context {
     let matches = query(it.target)
-    if matches.len() == 0 {
-      panic("参照先が見つかりません: " + repr(it.target))
-    }
+    // 未定義ラベルはそのままTypstへ返します。ここでpanicすると、エラー位置が
+    // 参照を書いたソース行ではなくこのライブラリ内を指してしまいます。
+    if matches.len() == 0 { return it }
     let target = matches.first()
     if target.func() == metadata and target.value.at("kind", default: none) == "article" {
       target.value.display
@@ -370,14 +377,26 @@
 
   // 確定した設定を、後続する本文内の補助関数から参照可能にします。
   _config-state.update(config)
+
+  // 目次はコンパイル単位全体の見出しを検索するため、1つの文書に複数の
+  // regulationがあると互いの条が混ざります。黙って誤った目次を出すより
+  // 早期に失敗させます。
+  _instance-state.update(count => count + 1)
+  context {
+    if _instance-state.get() > 1 {
+      panic("regulation は1つのコンパイル単位につき1回だけ使用してください。目次が文書全体を検索するため、複数の文書は結合できません。")
+    }
+  }
+
   if config.cover {
-    align(center, text(
+    // 表紙にはページ番号を表示しません。ページ数の計上は継続するため、
+    // 目次のページ番号は表紙を含めた通し番号になります。
+    page(numbering: none, align(center, text(
       font: config.heading-font,
       size: config.title-size,
       weight: config.heading-weight,
       title,
-    ))
-    pagebreak()
+    )))
   }
   if config.toc {
     outline(
