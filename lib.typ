@@ -212,9 +212,11 @@
 // `full: true` により numbering は親からの番号すべてを受け取るため、引数が1つなら
 // 最上位＝項、2つ以上なら入れ子＝号です。号は項数にかかわらず採番を維持します。
 // `full` を変更するとこの判別が壊れます。
+// 番号を空にすると列挙が番号欄を詰めてしまい、単一項の条だけ本文が左へ寄ります。
+// `hide` は描画せず幅だけ残すため、条をまたいで本文の左端が揃います。
 #let _singleton-paragraph-numbering(..numbers) = {
   let values = numbers.pos()
-  if values.len() == 1 { [] } else { _enum-numbering(..numbers) }
+  if values.len() == 1 { hide(_enum-numbering(..numbers)) } else { _enum-numbering(..numbers) }
 }
 
 // 号リストを含む項かどうかを判定します。Typstのマークアップでは、入れ子の列挙は
@@ -255,7 +257,13 @@
     context {
       let config = _config-state.get()
       let number = counter("described-item").get().first()
-      block(above: config.described-item-above, below: config.described-item-below)[
+      // 列挙は自身のラベルの前に `enum-indent` を挿入します。見出し型の号も同じ
+      // 字下げを与えることで、入れ子の深さにかかわらず通常の号と同じ位置へ並びます。
+      block(
+        above: config.described-item-above,
+        below: config.described-item-below,
+        inset: (left: config.enum-indent),
+      )[
         #grid(
           columns: (config.described-item-label-width, 1fr),
           column-gutter: config.described-item-gap,
