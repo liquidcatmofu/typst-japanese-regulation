@@ -60,7 +60,7 @@ rules/02-procedure.typ   手続（節、参照、表、改ページ）
 同梱の example は次のように確認できます。既定フォントを利用環境へ用意してください。
 
 ```sh
-typst compile --root . examples/basic.typ basic.pdf
+typst compile examples/basic.typ basic.pdf
 ```
 
 ### 和文の段落は1行で書く

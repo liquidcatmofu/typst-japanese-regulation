@@ -1,4 +1,4 @@
-#import "../lib.typ": article, regulation
+#import "@preview/hanko-kitei:0.1.0": article, regulation
 
 #show: regulation.with(
   title: "規程サンプル",
