@@ -5,6 +5,45 @@
 // 書式は `default-config` にまとめ、文書ごとの差分だけを
 // `regulation(config: (...))` で上書きします。
 
+/// 行送りのプリセットです。`config: (line-spacing: "compact")` のように選びます。
+///
+/// 縦方向の間隔は2種類の値で決まります。段落内の折り返しは `body-leading`、
+/// 項・号・条名などの区切りはブロック間隔（`enum-spacing` ほか）です。両者が
+/// ずれると、段落内の行より段落どうしのほうが詰まって見えます。各プリセットは
+/// 両者を揃え、10.5ptの本文で次のベースライン間隔になります。
+///
+/// - `roomy`：約18.2pt（本文の1.73倍）。Word原本の18pt送りに最も近い設定です。
+/// - `normal`：約16.6pt（1.58倍）。既定値です。
+/// - `compact`：約15.0pt（1.43倍）。
+///
+/// 個別の値は `config` で直接上書きでき、プリセットより優先されます。
+#let line-spacing-presets = (
+  roomy: (
+    body-leading: 1.0em,
+    enum-spacing: 1.0em,
+    article-below: 1.0em,
+    described-item-above: 1.0em,
+    described-item-below: 1.0em,
+    item-group-below: 0.35em,
+  ),
+  normal: (
+    body-leading: 0.85em,
+    enum-spacing: 0.85em,
+    article-below: 0.9em,
+    described-item-above: 0.85em,
+    described-item-below: 0.85em,
+    item-group-below: 0.35em,
+  ),
+  compact: (
+    body-leading: 0.7em,
+    enum-spacing: 0.7em,
+    article-below: 0.75em,
+    described-item-above: 0.7em,
+    described-item-below: 0.7em,
+    item-group-below: 0.35em,
+  ),
+)
+
 /// `regulation` が使用する書式の既定値です。
 ///
 /// 変更する値だけを `regulation` の `config` 引数へ渡します。
@@ -12,11 +51,14 @@
 ///
 /// 一部の値だけを簡単に上書きできるよう、辞書は意図的に
 /// 入れ子にせずフラットな構造にしています。
+///
+/// 行送り関連の値は `line-spacing-presets.normal` から取り込みます。
 #let default-config = (
   body-font: "Noto Serif CJK JP",
   heading-font: "Noto Sans CJK JP",
   cover: true,
   toc: true,
+  line-spacing: "normal",
 
   paper: "a4",
   page-margin: (top: 30mm, bottom: 22mm, left: 28mm, right: 28mm),
@@ -24,7 +66,6 @@
   page-number-align: center + bottom,
 
   body-size: 10.5pt,
-  body-leading: 0.85em,
   body-justify: true,
   heading-weight: "regular",
   title-size: 20pt,
@@ -37,7 +78,6 @@
   section-above: 1.5em,
   section-below: 0.8em,
   article-above: 1.8em,
-  article-below: 0.5em,
   heading-title-gap: 1em,
 
   // この文字数と一致する題名にだけ、短い題名用の字間を挿入します。
@@ -49,14 +89,10 @@
   paragraph-indent: 1em,
   enum-indent: 1em,
   enum-body-indent: 1em,
-  enum-spacing: 0.45em,
-  item-group-below: 0.7em,
   omit-single-paragraph-number: true,
 
   described-item-label-width: 3em,
   described-item-gap: 0pt,
-  described-item-above: 0.45em,
-  described-item-below: 0.45em,
   described-item-indent: 1em,
 
   toc-title: [目次],
@@ -66,6 +102,8 @@
   toc-entry-indent: 1em,
   toc-column-gap: 0.5em,
   toc-label-gap: 0.5em,
+
+  ..line-spacing-presets.normal,
 )
 
 // 条と用語リストの補助関数は本文内で評価されます。各呼び出しに設定引数を
@@ -230,8 +268,18 @@
   /// 規程本文全体です。
   body,
 ) = {
-  // 後方の辞書が既定値を上書きするため、利用側は差分だけを指定できます。
-  let config = default-config + config
+  // 後方の辞書が前方を上書きします。行送りプリセットは既定値の上に重ね、
+  // 利用側が個別に指定した値はプリセットより優先されます。
+  let preset-name = config.at("line-spacing", default: default-config.line-spacing)
+  assert(
+    preset-name in line-spacing-presets,
+    message: "line-spacing は "
+      + line-spacing-presets.keys().join("、")
+      + " のいずれかを指定してください（指定値: "
+      + repr(preset-name)
+      + "）",
+  )
+  let config = default-config + line-spacing-presets.at(preset-name) + config
 
   // regulationごとに独立した採番を開始します。outline自体はコンパイル単位全体を
   // 走査するため、1コンパイル単位につきregulationは1回だけ使用してください。

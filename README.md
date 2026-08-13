@@ -51,6 +51,26 @@ typst compile --root . examples/basic.typ /tmp/basic.pdf
 書式の既定値は `default-config` に集約されています。変更する値だけを
 `regulation(config: (...))` へ渡せます。
 
+## 行送り
+
+縦方向の間隔は `line-spacing` プリセットで選びます。10.5ptの本文でのベースライン間隔は
+次のとおりです。
+
+| プリセット | 間隔 | 本文サイズ比 |
+| --- | --- | --- |
+| `roomy` | 約18.2pt | 1.73倍 |
+| `normal`（既定） | 約16.6pt | 1.58倍 |
+| `compact` | 約15.0pt | 1.43倍 |
+
+```typst
+#show: regulation.with(config: (line-spacing: "compact"))
+```
+
+段落内の折り返しは `body-leading`、項・号・条名などの区切りはブロック間隔
+（`enum-spacing`、`article-below`、`described-item-above` / `-below`）が決めます。
+プリセットは両者を揃えるので、段落内の行より段落どうしが詰まって見える状態になりません。
+個別の値を `config` で直接指定すると、プリセットより優先されます。
+
 文書メタデータは `title` / `author`、フォントは `config` の `body-font` /
 `heading-font`、表紙と目次は `cover` / `toc` で設定できます。表紙にページ番号は
 表示しませんが、ページ数の計上は継続します。
